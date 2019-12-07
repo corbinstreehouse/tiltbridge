@@ -4,7 +4,8 @@
 
 #include "bridge_lcd.h"
 #include "img/fermentrack_logo.h"
-
+#include <WiFi.h>
+#include "jsonConfigHandler.h"
 bridge_lcd lcd;
 
 
@@ -90,8 +91,14 @@ void bridge_lcd::display_tilt_screen(uint8_t screen_number) {
     // Clear out the display before we start printing to it
     clear();
 
+    if (WiFi.status()== WL_CONNECTED ) {
+        print_line(WiFi.SSID(), "", 1);
+    } else {
+        print_line("WIFI NOT CONNECTED!", "", 1);
+    }
+
     // Display the header row
-    print_line("Color", "Gravity", 1);
+    print_line("Color", "Gravity", 2);
 
     // Loop through each of the tilt colors cached by tilt_scanner, searching for active tilts
     for(uint8_t i = 0;i<TILT_COLORS;i++) {
@@ -99,7 +106,7 @@ void bridge_lcd::display_tilt_screen(uint8_t screen_number) {
             active_tilts++;
             // This check has the added bonus of limiting the # of displayed tilts to TILTS_PER_PAGE
             if((active_tilts/TILTS_PER_PAGE)==screen_number) {
-                print_tilt_to_line(tilt_scanner.tilt(i), displayed_tilts+2);
+                print_tilt_to_line(tilt_scanner.tilt(i), displayed_tilts+3);
                 displayed_tilts++;
             }
         }
